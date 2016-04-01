@@ -1,0 +1,250 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/api/v1/
+
+# Webforms Analytics REST API
+
+NOTE: This is a draft of the upcoming Webforms Analytics REST API v1.
+
+## Forms
+
+Webforms Analytics distinguishes between Form Definitions and Form Records.
+
+### Form Defininitions
+
+A Form Definition _defines_ a form. It contains the form's name and all its fields,
+including their labels, technical names and simple types (`TEXT`, `NUMBER`, `DATE`,
+etc.).
+
+Form Definitions are typically created by editors in a Content Management System (CMS).
+
+TODO:
+ - Versioniert in CMS, daher UPDATE nicht möglich
+ - IDs werden vom CMS übernommen, nicht selbst vergeben
+ - Analytics kennt nur abgespeckte Definition, alle nötigen Informationen um Records
+   sinnvoll anzuzeigen
+
+### Form Records
+
+A Form Record represents a submitted form. It basically consists of key-value pairs
+where the keys are the technical names of the form fields and the values present the
+user's input.
+
+## Authentication
+
+All API methods require authentication, requests without or with invalid
+authentication will lead to a ``401: Unauthorized`` response.
+
+The REST API is accessible only by applications, therefore no user context is available
+and requests by users will be denied with a ``403: Forbidden`` response.
+
+To authenticate as an application the following steps are necessary:
+  
+  1. Visit the Webforms Reporting Webapp and log in as an administrator.
+  2. Navigate to _System Settings > API clients_.
+  3. Add a new client. The optional description helps to distinguish multiple clients.
+  4. Select the new client and invoke the _Request token_ action to obtain an access token.
+  5. Include an ``Authorization`` header with the access token in your API requests. The header
+should look like this: ``Authorization: Bearer <accesstoken>``.
+
+## Form Definitions Collection [/formdefinitions]
+
+The `/formdefinitions` endpoint offers actions to interact with the definitions of forms.
+Form Definitions are typically created, managed and versioned using a Content Management
+System (CMS).
+
+### List All Form Definitions [GET]
+
++ Response 200 (application/json)
+
+        [
+            {
+                "formId": "3182",
+                "versions": [5, 4, 2, 1]
+            },
+            {
+                "formId": "DE5394",
+                "versions": [1]
+            }
+        ]
+
+## Single Form Definition [/formdefinitions/{formId}]
+
+To access the Form Definition of a specific form, the URI is extended by the form's ID,
+eg. `/formdefinitions/3182`. Please note, that Form Definition is a versioned entity and
+that the URI has to be extended with a valid version or special keyword (eg. `latest`)
+to access the actual content of a Form Definition.
+
+### List All Versions Of A Form Definition [GET]
+
+Webforms Analytics keeps track of multiple Form Definition versions, since Form
+Definitions are usually managed in a CMS where content changes are accompanied by an
+increment of a version flag.
+
+This action can be used to retrieve all available versions of a Form Definition.
+
++ Parameters
+    + formId (string) - ID of the Form
+
++ Response 200 (application/json)
+
+        {
+            "formId": "3182",
+            "versions": [5, 4, 2, 1]
+        }
+
+
+### Specific Version Of A Form Definition [GET /formdefinitions/{formId}/{version}]
+
+This action retrieves a Form Definition of a specific version.
+
++ Parameters
+    + formId (string) - ID of the Form
+    + version (number) - Version of the Form
+
++ Response 200 (application/json)
+
+        {
+        }
+
+
+### Latest Version Of A Form Definition [GET /formdefinitions/{formId}/latest]
+
+This is a shortcut to the latest version of a Form Definition.
+
++ Parameters
+    + formId (string) - ID of the Form
+
++ Response 200 (application/json)
+
+        {
+            "formId": "3182",
+            "version": 5,
+            "name": "Contact Form",
+            "definition": [
+                {
+                    "key": "name",
+                    "label": "Your Name",
+                    "valueType": "TEXT"
+                }
+            ]
+        }
+
+### Create A New Form Definition [PUT /formdefinitions/{formId}/{version}]
+
+This action can be used to save a new version of a Form Definition. Both the form's
+ID and its version are managed by a CMS, therefore they must be present as path
+variables to successfully save a Form Definition.
+
++ Request Example: /3182/5 (application/json)
+
+        {
+            "definition": [
+                {
+                    "key": "name",
+                    "label": "Your Name",
+                    "valueType": "TEXT"
+                }
+            ]
+        }
+
++ Response 201 (application/json)
+
+    + Headers
+            
+            Location: /formdefinitions/3182/5
+
+
++ Response 409 (application/json)
+
+        {
+            "message": "Version 5 of form 3182 already exists."
+        }
+
+## Form Records Collection [/formrecords]
+
+The `/formrecords` endpoint offers actions to interact with the records of forms.
+
+### Query Form Records [GET /formrecords{?formId,offset,limit,order}]
+
+to be defined
+
++ Parameters
+    + formId (string) - ID of the Form
+    + offset (number, optional)
+    + limit (number, optional)
+    + order (string, optional)
+
++ Response 200 (application/json)
+
+    + Headers
+    
+            Link: <TODO>; rel="next",<TODO>; rel="last", <TODO>; rel="first", <TODO>; rel="prev"
+
+    + Body
+    
+            [
+            ]
+
+
+### Create A New Form Record [POST]
+
+You can use this action to create a new Form Record. As opposed to Form Definitions,
+Webforms Analytics will assign an ID for this entity. This is because Form Records
+are solely managed by Webforms Analytics and unknown by the CMS.
+
+The request body must provide a `formId` and `version`. If the request body contains
+a valid `creationTimestamp` it is retained, otherwise the current system time is
+assigned.
+
+
++ Request (application/json)
+
+        {
+            "formId": "3182",
+            "version": 5,
+            "creationTimestamp": 1456323623860,
+            "fields": {
+                "name": "Sebastian Müller",
+                "age": 48
+            }
+        }
+
++ Response 201 (application/json)
+
+    + Headers
+            
+            Location: /formrecords/1717a357-1563-4140-8ded-db3f22f322d8
+
+## Single Form Record [/formrecords/{recordId}]
+
+This endpoint offers actions to retrieve and delete a single Form Record.
+
++ Parameters
+    + recordId (string) - ID of the Form Record
+
+### Retrieve A Form Record [GET]
+
+This action retrieves a single Form Record.
+
+`404` is returned if the requested `recordId` is not available.
+
++ Response 200 (application/json)
+
+        {
+            "recordId": "cb29c806-d222-4c02-b66e-c7c5363608a7",
+            "formId": "3182",
+            "version": 5,
+            "creationTimestamp": 1456310303838,
+            "fields": {
+                "name": "API Consumer",
+                "age": 31
+            }
+        }
+
++ Response 404 (application/json)
+
+### Delete A Form Record [DELETE]
+
+This action deletes a single Form Record.
+
++ Response 204 (application/json)
