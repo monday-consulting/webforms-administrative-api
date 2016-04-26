@@ -125,6 +125,16 @@ This is a shortcut to the latest version of a Form Definition.
                     "key": "name",
                     "label": "Your Name",
                     "valueType": "TEXT"
+                },
+                {
+                    "key": "text",
+                    "label": "Please enter Your question here:",
+                    "valueType": "TEXT"
+                },
+                {
+                    "key": "email",
+                    "label": "How can we get back to You?",
+                    "valueType": "TEXT"
                 }
             ]
         }
@@ -148,6 +158,16 @@ variables to successfully save a Form Definition.
                         "key": "name",
                         "label": "Your Name",
                         "valueType": "TEXT"
+                    },
+                    {
+                        "key": "text",
+                        "label": "Please enter Your question here:",
+                        "valueType": "TEXT"
+                    },
+                    {
+                        "key": "email",
+                        "label": "How can we get back to You?",
+                        "valueType": "TEXT"
                     }
                 ]
             }
@@ -166,6 +186,16 @@ variables to successfully save a Form Definition.
                     {
                         "key": "name",
                         "label": "Your Name",
+                        "valueType": "TEXT"
+                    },
+                    {
+                        "key": "text",
+                        "label": "Please enter Your question here:",
+                        "valueType": "TEXT"
+                    },
+                    {
+                        "key": "email",
+                        "label": "How can we get back to You?",
                         "valueType": "TEXT"
                     }
                 ]
@@ -227,7 +257,8 @@ assigned.
                 "creationTimestamp": 1456323623860,
                 "fields": {
                     "name": "Sebastian Müller",
-                    "text": "Hi! I just wanted to test your API, thanks."
+                    "text": "Hi! I just wanted to test your API, thanks.",
+                    "email": "sebastian.mueller@your.domain.tld"
                 }
             }
 
@@ -265,7 +296,8 @@ This action retrieves a single Form Record.
             "creationTimestamp": 1456310303838,
             "fields": {
                 "name": "Sebastian Müller",
-                "text": "Hi! I just wanted to test your API, thanks."
+                "text": "Hi! I just wanted to test your API, thanks.",
+                "email": "sebastian.mueller@your.domain.tld"
             },
             "attachments": {
                 "key": "photo",
@@ -322,7 +354,7 @@ Attachments
             Content-Type: application/json
             
             {
-                "key": "photo",
+                 "key": "photo",
                  "contentType": "text/plain",
                  "contentSize": 8310,
                  "fileName": "file1",
