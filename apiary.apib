@@ -359,12 +359,12 @@ This action deletes a single Form Record.
 + Response 204
 
 
-## Record Attachments [/attachments]
+## Record Attachments [/formattachments]
 
 The `/attachments` offers actions to add or get attachments.
 Attachments must be assigned to an existing form-record (see `/formrecords`)
 
-### Get Attachment [GET /attachments/{attachmentId}]
+### Get Attachment [GET /formattachments/{attachmentId}]
 
 This action retrieves a single Form Attachment.
 
@@ -429,7 +429,7 @@ The request body must provide a `recordId`, which has to assigned to an existing
 
     + Headers
 
-            Content-Location: https://wfa.tld/formrecords/{recordId}/attachments/f198e04a-b3a5-40dd-9d58-c4f9a7544ad6
+            Content-Location: https://wfa.tld/formattachments/f198e04a-b3a5-40dd-9d58-c4f9a7544ad6
         
     + Body
     
