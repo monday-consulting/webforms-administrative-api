@@ -15,13 +15,21 @@ A Form Definition _defines_ a form. It contains the form's name and all its fiel
 including their labels, technical names and simple types (`TEXT`, `NUMBER`, `DATE`,
 etc.).
 
-Form Definitions are typically created by editors in a Content Management System (CMS).
+Form Definitions are typically created by editors in a Content Management System (CMS)
+and used by Webforms Analytics to display input values in a meaningfull way as well as 
+to provide semantically correct filtering options to facilitate drilldowns into the
+records collections. Since form definitions are only used in a specific capacity by 
+Webforms Analytics there are a few things that need to be mentioned
+* It is the CMS' responsibility to correctly version the form definitions.
+* There is no way to update a form definition. Each change to a form definition should
+  result in the CMS issuing a new verision of the form definition, not a change to an
+  existing specification.
+* Webforms Analytics only stores a slimmed down version of the form defintion.
+  Specifically:
+  * Condition set up is not persisted.
+  * Javascript validation and calculated values are not persisted.
 
-TODO:
- - Versioniert in CMS, daher UPDATE nicht möglich
- - IDs werden vom CMS übernommen, nicht selbst vergeben
- - Analytics kennt nur abgespeckte Definition, alle nötigen Informationen um Records
-   sinnvoll anzuzeigen
+  
 
 ### Form Records
 
