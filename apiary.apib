@@ -287,8 +287,10 @@ You have to escape semicolons that are not used as delimeter.
                         "recordId": "b3a121c1-177f-4446-929d-a8874f40aed9",
                         "formId": "3164",
                         "version": 1,
-                        "creationTimestamp": 1456310303838,
                         "fields": {
+                            "name": "Sebastian Müller",
+                            "text": "Hi! I just wanted to test your API, thanks.",
+                            "email": "sebastian.mueller@your.domain.tld"
                             "_WF_creationTime": 1461207427882,
                             "_WF_version": "2"
                         },
@@ -305,20 +307,19 @@ You can use this action to create a new Form Record. As opposed to Form Definiti
 Webforms Analytics will assign an ID for this entity. This is because Form Records
 are solely managed by Webforms Analytics and unknown by the CMS.
 
-The request body must provide a `formId` and `version`. If the request body contains
-a valid `creationTimestamp` it is retained, otherwise the current system time is
-assigned.
+The request body must provide a `formId` and `version`. 
 
 + Request (application/json)
 
             {
                 "formId": "3164",
                 "version": 1,
-                "creationTimestamp": 1456323623860,
                 "fields": {
                     "name": "Sebastian Müller",
                     "text": "Hi! I just wanted to test your API, thanks.",
                     "email": "sebastian.mueller@your.domain.tld"
+                    "_WF_creationTime": 1461207427882,
+                    "_WF_version": "2"
                 }
             }
 
@@ -353,10 +354,12 @@ This action retrieves a single Form Record.
             "recordId": "b3a121c1-177f-4446-929d-a8874f40aed9",
             "formId": "3164",
             "version": 1,
-            "creationTimestamp": 1456310303838,
             "fields": {
-                "_WF_creationTime": 1461207427882,
-                "_WF_version": "2"
+                    "name": "Sebastian Müller",
+                    "text": "Hi! I just wanted to test your API, thanks.",
+                    "email": "sebastian.mueller@your.domain.tld"
+                    "_WF_creationTime": 1461207427882,
+                    "_WF_version": "2"
             },
             "attachments": [
             ]
