@@ -12,14 +12,13 @@ Webforms Analytics distinguishes between Form Definitions and Form Records.
 ### Form Defininitions
 
 A Form Definition _defines_ a form. It contains the form's name and all its fields,
-including their labels, technical names and simple types (`TEXT`, `NUMBER`, `DATE`,
-etc.).
+including their labels, technical names and types.
 
 Form Definitions are typically created by editors in a Content Management System (CMS)
 and used by Webforms Analytics to display input values in a meaningfull way as well as 
-to provide semantically correct filtering options to facilitate drilldowns into the
+to provide semantically relevant filtering options to facilitate drilldowns into the
 records collections. Since form definitions are only used in a specific capacity by 
-Webforms Analytics there are a few things that need to be mentioned
+Webforms Analytics there are a few things that need to be kept in mind:
 * It is the CMS' responsibility to correctly version the form definitions.
 * There is no way to update a form definition. Each change to a form definition should
   result in the CMS issuing a new verision of the form definition, not a change to an
@@ -29,6 +28,7 @@ Webforms Analytics there are a few things that need to be mentioned
   * Condition set up is not persisted.
   * Javascript validation and calculated values are not persisted.
 
+#### Form Fields
   
 
 ### Form Records
