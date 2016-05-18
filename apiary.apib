@@ -29,7 +29,35 @@ Webforms Analytics there are a few things that need to be kept in mind:
   * Javascript validation and calculated values are not persisted.
 
 #### Form Fields
-  
+A Form Field an object with three properties, `name`, `label` and `type`. 
+
+- `name` is the technical name of the Form Field. This is a unique string in the form 
+  definition.
+- `label` is the human readable counterpart of the Form Field. It can range from a 
+  whole sentence calling the user to action to just a description of the expected input.
+- `type` is a classifier describing what data this field actually holds. Webforms 
+  Analytics distinguishes between the following data types:
+  + `TEXT`  
+    Simple freeform text, usually represented to the user of the form as a text area or
+    text ipnut field.
+  + `DATE`  
+    A Unix timestamp with millisecond accuracy. These usually are presented to the user 
+    as a date picker
+  + `DATETIME`  
+    Same as `DATE` just with a time of day component.
+  + `NUMBER`  
+    A numeric value, floating point or not.
+  + `FILE`
+    An attached file, see also the Attachments section for more information
+  + `PASSWORD`  
+    Like `TEXT` but should not be made visible in plain sight to consumers.
+  + `PAGEBREAK`
+    A formating element describing the end of a page in a multipage form. Consuming
+    applications can use this to paginate the display of form records
+  + `STATUS`
+    A string based enumeration.
+  + `STRING_ARRAY`  
+    An array of textual data represented as a JSON list of strings in API responses.
 
 ### Form Records
 
