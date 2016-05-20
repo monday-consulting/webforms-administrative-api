@@ -309,7 +309,7 @@ variables to successfully save a Form Definition.
 
 The `/formrecords` endpoint offers actions to interact with the records of forms.
 
-### Query Form Records [GET /formrecords{?formId,offset,limit,order,query}]
+### Query Form Records [GET /formrecords{?formId,offset,size,sort,query}]
 
 To query for FormRecords, you have describe the name of the inputfield, followed by the comparison operation
 and last the value wich you are searching for.
@@ -338,8 +338,8 @@ You have to escape semicolons that are not used as delimeter.
 + Parameters
     + formId: `3182` (string) - ID of the Form
     + offset: 0 (number, optional)
-    + limit: 50 (number, optional)
-    + order (string, optional)
+    + size: 50 (number, optional)
+    + sort (string, optional)
     + query (string, optional)
 
 + Response 200 (application/json)
