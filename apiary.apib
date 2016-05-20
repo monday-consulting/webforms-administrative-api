@@ -72,6 +72,39 @@ A Form Record represents a submitted form. It basically consists of key-value pa
 where the keys are the technical names of the form fields and the values present the
 user's input.
 
+
+## User Administration
+
+The REST API also provides methods for user administration. Users can be organized in
+Groups. Permissions define which actions a User or a Group is allowed to perform on
+a Form.
+
+### Users
+
+A user corresponds to a person who is eligible to use Webforms Analytics. It is identified
+by a unique name and email address, which both serve as a login name.
+
+By default, new users will have no Permissions. If they log in to Webforms Analytics, they
+won't see form records of any form.
+
+### Groups
+
+Groups can be used to organize a growing base of users. Webforms Analytics comes with three
+predefined groups: _Administration group_, _User group_ and _Unapproved users_. Members of
+the _Administration group_ gain administrative privileges, the _User group_ simply contains
+all approved users and self-registered users become members of the _Unapproved users_ group.
+
+### Permissions
+
+Permissions define which actions a user or a group is allowed to perform on form records. A
+permission assigns one or multiple rights on a form to a user or group. The following rights
+are currently available: `READ`, `EXPORT`, `DELETE`.
+
+JSON Example of a user's permission that qualifies them to view and export form records of
+the form with ID 3182:
+``{"userId": "1", "formId": "3182", "rights": ["READ", "EXPORT"]}``
+
+
 ## Authentication
 
 All API methods require authentication, requests without or with invalid
