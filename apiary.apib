@@ -531,3 +531,357 @@ The request body must provide a `recordId`, which has to assigned to an existing
             {
                 "attachmentId": "f198e04a-b3a5-40dd-9d58-c4f9a7544ad6"
             }
+
+
+## Users Collection [/users]
+
+The `/users` endpoint offers methods to list all existing users and to create new users.
+
+### List All Users [GET /users{?offset,size}]
+
+Here, you can list all exisiting users. The parameters `offset` and `size` offer paging
+capabilities. Please note that the property `groups` only contains IDs and that the `permissions`
+collection includes user and group permissions.
+
++ Parameters
+    + offset: 0 (number, optional)
+    + size: 50 (number, optional)
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "totalSize": 15,
+                "size": 5,
+                "offset": 0,
+                "data": [
+                    {
+                        "id": "d613cea8-c964-4ff1-b88e-2f64efcfb531",
+                        "name": "admin",
+                        "email": "admin",
+                        "language": "de",
+                        "enabled": true,
+                        "system": true,
+                        "approved": true,
+                        "created": 0,
+                        "lastLogin": 1462527293309,
+                        "groups": ["e0bd1023-974a-4de6-9ba9-de1552702d9e", "195e1758-6a13-4e76-a419-8ba7fbbaa3d5"],
+                        "permissions": []
+                    }
+                ]
+            }
+
+
+### Create A User [POST]
+
+This method allows the creation of new users. To create a new user, the only
+required fields are `name` and `email`, which must be unique. The user will
+receive an email containing a login link, if the request does not contain a
+`password`.
+
+The request also might contain form permissions and an array of group IDs
+(property `groups`).
+
+Allowed values for the field `language` are `en` and `de`. Webforms Analytics
+will fall back on the browser settings, if no user language is set.
+
++ Request (application/json)
+
+            {
+                "name": "Oliver",
+                "email": "od@m14g.com",
+                "language": "de",
+                "password": "oliver",
+                "permissions": [{
+                    "formId": "3182",
+                    "rights": ["READ", "EXPORT", "DELETE"]
+                }]
+            }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Content-Location: $HOST/users/bd2d140b-61ec-40c9-b9ac-984cdf76eb86
+
+    + Body
+
+            {
+                "id": "bd2d140b-61ec-40c9-b9ac-984cdf76eb86"
+            }
+
+## Single User [/users/{id}]
+
+The single user endpoint `/users/{id}` offers methods to retrieve and to
+delete a single user.
+
++ Parameters
+    + id: `cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9` (string) - ID of the User
+
+
+### Retrieve A User [GET]
+
+Here, you can retrieve a single user.
+
+Please note that the property `groups` only contains IDs and that the
+`permissions` collection includes user and group permissions.
+
++ Response 200 (application/json)
+
+            {
+                "id": "cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9",
+                "name": "admin",
+                "email": "admin",
+                "language": "de",
+                "enabled": true,
+                "system": true,
+                "approved": true,
+                "created": 0,
+                "lastLogin": 1462527293309,
+                "groups": ["e0bd1023-974a-4de6-9ba9-de1552702d9e", "195e1758-6a13-4e76-a419-8ba7fbbaa3d5"],
+                "permissions": []
+            }
+
+### Delete A User [DELETE]
+
+This method deletes a user.
+
+Users having the `system` flag set to `true` can't be deleted.
+
++ Response 204
+
+### Get All Groups Of A User [GET /users/{id}/groups]
+
+Returns all groups of the given user.
+
+In contrast to the _Retrieve A User_ method, full group information is provided.
+
++ Parameters
+    + id: `cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9` (string) - ID of the User
+
++ Response 200 (application/json)
+
+    + Body
+
+            [{
+                "id": "195e1758-6a13-4e76-a419-8ba7fbbaa3d5",
+                "name": "User group",
+                "description": "Default group for users",
+                "system": true,
+                "roles": [{"role": "ROLE_USER"}],
+                "permissions": []
+            }]
+
+
+### Add A User To A Group [POST /users/{id}/groups/{groupId}]
+
++ Parameters
+    + id: `cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9` (string) - ID of the User
+    + groupId: `195e1758-6a13-4e76-a419-8ba7fbbaa3d5` (string) - ID of the Group
+
++ Response 200
+
+
+### Remove A User From A Group [DELETE /users/{id}/groups/{groupId}]
+
++ Parameters
+    + id: `cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9` (string) - ID of the User
+    + groupId: `195e1758-6a13-4e76-a419-8ba7fbbaa3d5` (string) - ID of the Group
+
++ Response 200
+
+
+### Get All User Permissions [GET /users/{id}/permissions]
+
++ Parameters
+    + id: `cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9` (string) - ID of the User
+
++ Response 200 (application/json)
+
+            [{
+                "id": "d5047b8d-bb6e-44bf-9c2b-f485345092f1",
+                "formId": "3182",
+                "userId": "cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9",
+                "rights": ["READ", "EXPORT"]
+            }]
+
+
+### Get A Single User Permission [GET /users/{id}/permissions/{permissionId}]
+
++ Parameters
+    + id: `cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9` (string) - ID of the User
+    + permissionId: `9242433a-4d31-46a0-a8e5-d97d6dc0b2bc` (string) - ID of the Permission
+
++ Response 200 (application/json)
+
+            {
+                "id": "9242433a-4d31-46a0-a8e5-d97d6dc0b2bc",
+                "userId": "cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9",
+                "formId": "3182",
+                "rights": ["READ", "EXPORT"]
+            }
+
+
+### Delete A User Permission [DELETE /users/{id}/permissions/{permissionId}]
+
++ Parameters
+    + id: `cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9` (string) - ID of the User
+    + permissionId: `9242433a-4d31-46a0-a8e5-d97d6dc0b2bc` (string) - ID of the Permission
+
++ Response 204
+
+
+## Groups Collection [/groups]
+
+### List All Groups [GET /groups{?offset,size}]
+
++ Parameters
+    + offset: 0 (number, optional)
+    + size: 50 (number, optional)
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "totalSize": 2,
+                "size": 5,
+                "offset": 0,
+                "data": [
+                    {
+                        "id": "e0bd1023-974a-4de6-9ba9-de1552702d9e",
+                        "name": "Administration group",
+                        "description": "Default group for admins",
+                        "system": true,
+                        "roles": [{"role": "ROLE_ADMIN"}],
+                        "permissions": []
+                    },
+                    {
+                        "id": "195e1758-6a13-4e76-a419-8ba7fbbaa3d5",
+                        "name": "User group",
+                        "description": "Default group for users",
+                        "system": true,
+                        "roles": [{"role": "ROLE_USER"}],
+                        "permissions": []
+                    }
+                ]
+            }
+
+### Create A Group [POST]
+
++ Request (application/json)
+
+            {
+                "name": "Raffle August '16",
+                "description": "Supervision of the raffle in Aug 2016",
+                "permissions": [{
+                    "formId": "3168",
+                    "rights": ["READ", "EXPORT"]
+                }]
+            }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Content-Location: $HOST/groups/6ee55f3c-0741-4263-9d75-8a0332c665e1
+
+    + Body
+
+            {
+                "id": "6ee55f3c-0741-4263-9d75-8a0332c665e1"
+            }
+
+
+## Single Group [/groups/{id}]
+
++ Parameters
+    + id: `23ab529a-7066-4e92-90c2-9fed6d2a74ef` (string) - ID of the Group
+
+
+### Retrieve A Group [GET]
+
++ Response 200 (application/json)
+
+            {
+                "name": "Raffle August '16",
+                "description": "Supervision of the raffle in Aug 2016",
+                "system": false,
+                "roles": [],
+                "permissions": [{
+                    "formId": "3168",
+                    "rights": ["READ", "EXPORT"]
+                }]
+            }
+
+### Delete A Group [DELETE /groups/{id}{?strict}]
+
++ Parameters
+    + strict: `true` (string, optional) - return 404 when Group does not exist
+
++ Response 204
+
+### Add a Group Permission [POST /groups/{id}/permissions]
+
++ Parameters
+    + id: `23ab529a-7066-4e92-90c2-9fed6d2a74ef` (string) - ID of the Group
+
++ Request (application/json)
+
+            {
+                "formId": "3182",
+                "rights": ["READ", "EXPORT"]
+            }
+
++ Response 200
+
+
+### Get All Group Permissions [GET /groups/{id}/permissions]
+
++ Response 200 (application/json)
+
+            [{
+                "id": "d5047b8d-bb6e-44bf-9c2b-f485345092f1",
+                "formId": "3182",
+                "groupId": "23ab529a-7066-4e92-90c2-9fed6d2a74ef",
+                "rights": ["READ", "EXPORT"]
+            }]
+
+
+### Get A Single Group Permission [GET /groups/{id}/permissions/{permissionId}]
+
++ Parameters
+    + id: `23ab529a-7066-4e92-90c2-9fed6d2a74ef` (string) - ID of the Group
+    + permissionId: `9242433a-4d31-46a0-a8e5-d97d6dc0b2bc` (string) - ID of the Permission
+
++ Response 200 (application/json)
+
+            {
+                "id": "9242433a-4d31-46a0-a8e5-d97d6dc0b2bc",
+                "groupId": "23ab529a-7066-4e92-90c2-9fed6d2a74ef",
+                "formId": "3182",
+                "rights": ["READ", "EXPORT"]
+            }
+
+
+### Delete A Group Permission [DELETE /groups/{id}/permissions/{permissionId}]
+
++ Parameters
+    + permissionId: `9242433a-4d31-46a0-a8e5-d97d6dc0b2bc` (string) - ID of the Permission
+
++ Response 204
+
+### Add A Group Member [POST /groups/{id}/users/{userId}]
+
++ Parameters
+    + userId: `6aa59a5f-6ad6-42d7-a20c-9878d24d4ad2` (string) - ID of the User
+
++ Response 200
+
+### Remove A Group Member [DELETE /groups/{id}/users/{userId}]
+
++ Parameters
+    + userId: `6aa59a5f-6ad6-42d7-a20c-9878d24d4ad2` (string) - ID of the User
+
++ Response 200
