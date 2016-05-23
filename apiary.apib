@@ -734,7 +734,13 @@ In contrast to the _Retrieve A User_ method, full group information is provided.
 
 ## Groups Collection [/groups]
 
+The `/groups` endpoint offers methods to list all existing groups and to create new groups.
+
 ### List All Groups [GET /groups{?offset,size}]
+
+This method lists all exisiting groups. The parameters `offset` and `size` offer paging
+capabilities.
+
 
 + Parameters
     + offset: 0 (number, optional)
@@ -770,6 +776,11 @@ In contrast to the _Retrieve A User_ method, full group information is provided.
 
 ### Create A Group [POST]
 
+This method allows the creation of new groups. To create a new group, the only
+required field is `name`, which must be unique.
+
+The request also might contain an optional `description` and form permissions.
+
 + Request (application/json)
 
             {
@@ -796,11 +807,16 @@ In contrast to the _Retrieve A User_ method, full group information is provided.
 
 ## Single Group [/groups/{id}]
 
+The single group endpoint `/groups/{id}` offers methods to retrieve and to
+delete a single group.
+
 + Parameters
     + id: `23ab529a-7066-4e92-90c2-9fed6d2a74ef` (string) - ID of the Group
 
 
 ### Retrieve A Group [GET]
+
+Here, you can retrieve a single group.
 
 + Response 200 (application/json)
 
@@ -816,6 +832,10 @@ In contrast to the _Retrieve A User_ method, full group information is provided.
             }
 
 ### Delete A Group [DELETE /groups/{id}{?strict}]
+
+This method deletes a group.
+
+Groups having the `system` flag set to `true` can't be deleted.
 
 + Parameters
     + strict: `true` (string, optional) - return 404 when Group does not exist
