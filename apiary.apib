@@ -676,6 +676,11 @@ In contrast to the _Retrieve A User_ method, full group information is provided.
 
 ### Add A User To A Group [POST /users/{id}/groups/{groupId}]
 
+Adds the user to the group. No error is thrown, if the user is already a
+member of the group.
+
+If the user or group does not exist, `Bad Request - 400` is returned.
+
 + Parameters
     + id: `cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9` (string) - ID of the User
     + groupId: `195e1758-6a13-4e76-a419-8ba7fbbaa3d5` (string) - ID of the Group
@@ -685,6 +690,11 @@ In contrast to the _Retrieve A User_ method, full group information is provided.
 
 ### Remove A User From A Group [DELETE /users/{id}/groups/{groupId}]
 
+Removes the user from the group. No error is thrown, if the user is not a
+member of the group.
+
+If the user or group does not exist, `Bad Request - 400` is returned.
+
 + Parameters
     + id: `cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9` (string) - ID of the User
     + groupId: `195e1758-6a13-4e76-a419-8ba7fbbaa3d5` (string) - ID of the Group
@@ -692,7 +702,40 @@ In contrast to the _Retrieve A User_ method, full group information is provided.
 + Response 200
 
 
+### Add or update a User Permission [POST /users/{id}/permissions]
+
+This method adds a permission to the user.
+
+Permissions assign a set of rights (`READ`, `EXPORT`, `DELETE`) to a
+form (identified via its ID). Users can only have one permission per
+form, repetitive requests override the previously assigned rights.
+
+The special form ID `*` is reserved and can be used to grant a user
+permissions on all forms.
+
+Permissions are additive: a user who only has the `READ` right for a form,
+but is also a member of a group which has the right to `EXPORT`, may perform
+read and export operations on that form.
+
++ Parameters
+    + id: `cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9` (string) - ID of the User
+
++ Request (application/json)
+
+            {
+                "formId": "3182",
+                "rights": ["READ", "EXPORT"]
+            }
+
++ Response 200
+
+
 ### Get All User Permissions [GET /users/{id}/permissions]
+
+Returns a list with all permissions of the user.
+
+The list contains permissions owned by the user and also all permissions
+from their groups.
 
 + Parameters
     + id: `cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9` (string) - ID of the User
@@ -709,6 +752,8 @@ In contrast to the _Retrieve A User_ method, full group information is provided.
 
 ### Get A Single User Permission [GET /users/{id}/permissions/{permissionId}]
 
+Returns a single user permission identified by its ID.
+
 + Parameters
     + id: `cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9` (string) - ID of the User
     + permissionId: `9242433a-4d31-46a0-a8e5-d97d6dc0b2bc` (string) - ID of the Permission
@@ -724,6 +769,8 @@ In contrast to the _Retrieve A User_ method, full group information is provided.
 
 
 ### Delete A User Permission [DELETE /users/{id}/permissions/{permissionId}]
+
+Deletes a user permission.
 
 + Parameters
     + id: `cdfae3d0-fed3-4bb6-bfe9-94f62bdb4ea9` (string) - ID of the User
@@ -842,7 +889,16 @@ Groups having the `system` flag set to `true` can't be deleted.
 
 + Response 204
 
-### Add a Group Permission [POST /groups/{id}/permissions]
+### Add or update a Group Permission [POST /groups/{id}/permissions]
+
+This method adds a permission to the group.
+
+Permissions assign a set of rights (`READ`, `EXPORT`, `DELETE`) to a
+form (identified via its ID). Groups can only have one permission per
+form, repetitive requests override the previously assigned rights.
+
+The special form ID `*` is reserved and can be used to grant a group
+permissions on all forms.
 
 + Parameters
     + id: `23ab529a-7066-4e92-90c2-9fed6d2a74ef` (string) - ID of the Group
@@ -859,6 +915,8 @@ Groups having the `system` flag set to `true` can't be deleted.
 
 ### Get All Group Permissions [GET /groups/{id}/permissions]
 
+Returns a list with all permissions of the group.
+
 + Response 200 (application/json)
 
             [{
@@ -870,6 +928,8 @@ Groups having the `system` flag set to `true` can't be deleted.
 
 
 ### Get A Single Group Permission [GET /groups/{id}/permissions/{permissionId}]
+
+Returns a single group permission identified by its ID.
 
 + Parameters
     + id: `23ab529a-7066-4e92-90c2-9fed6d2a74ef` (string) - ID of the Group
@@ -887,6 +947,8 @@ Groups having the `system` flag set to `true` can't be deleted.
 
 ### Delete A Group Permission [DELETE /groups/{id}/permissions/{permissionId}]
 
+Deletes a group permission.
+
 + Parameters
     + permissionId: `9242433a-4d31-46a0-a8e5-d97d6dc0b2bc` (string) - ID of the Permission
 
@@ -894,12 +956,22 @@ Groups having the `system` flag set to `true` can't be deleted.
 
 ### Add A Group Member [POST /groups/{id}/users/{userId}]
 
+Adds the user to the group. No error is thrown, if the user is already a
+member of the group.
+
+If the user or group does not exist, `Bad Request - 400` is returned.
+
 + Parameters
     + userId: `6aa59a5f-6ad6-42d7-a20c-9878d24d4ad2` (string) - ID of the User
 
 + Response 200
 
 ### Remove A Group Member [DELETE /groups/{id}/users/{userId}]
+
+Removes the user from the group. No error is thrown, if the user is not a
+member of the group.
+
+If the user or group does not exist, `Bad Request - 400` is returned.
 
 + Parameters
     + userId: `6aa59a5f-6ad6-42d7-a20c-9878d24d4ad2` (string) - ID of the User
