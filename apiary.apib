@@ -885,6 +885,7 @@ This method deletes a group.
 Groups having the `system` flag set to `true` can't be deleted.
 
 + Parameters
+    + id: `23ab529a-7066-4e92-90c2-9fed6d2a74ef` (string) - ID of the Group
     + strict: `true` (string, optional) - return 404 when Group does not exist
 
 + Response 204
@@ -916,6 +917,9 @@ permissions on all forms.
 ### Get All Group Permissions [GET /groups/{id}/permissions]
 
 Returns a list with all permissions of the group.
+
++ Parameters
+    + id: `23ab529a-7066-4e92-90c2-9fed6d2a74ef` (string) - ID of the Group
 
 + Response 200 (application/json)
 
@@ -950,6 +954,7 @@ Returns a single group permission identified by its ID.
 Deletes a group permission.
 
 + Parameters
+    + id: `23ab529a-7066-4e92-90c2-9fed6d2a74ef` (string) - ID of the Group
     + permissionId: `9242433a-4d31-46a0-a8e5-d97d6dc0b2bc` (string) - ID of the Permission
 
 + Response 204
@@ -962,6 +967,7 @@ member of the group.
 If the user or group does not exist, `Bad Request - 400` is returned.
 
 + Parameters
+    + id: `23ab529a-7066-4e92-90c2-9fed6d2a74ef` (string) - ID of the Group
     + userId: `6aa59a5f-6ad6-42d7-a20c-9878d24d4ad2` (string) - ID of the User
 
 + Response 200
@@ -974,6 +980,7 @@ member of the group.
 If the user or group does not exist, `Bad Request - 400` is returned.
 
 + Parameters
+    + id: `23ab529a-7066-4e92-90c2-9fed6d2a74ef` (string) - ID of the Group
     + userId: `6aa59a5f-6ad6-42d7-a20c-9878d24d4ad2` (string) - ID of the User
 
 + Response 200
