@@ -17,9 +17,9 @@ A Form Definition _defines_ a form. It contains the form's name and all its fiel
 including their labels, technical names and types.
 
 Form Definitions are typically created by editors in a Content Management System (CMS)
-and used by Webforms Analytics to display input values in a meaningfull way as well as 
+and used by Webforms Analytics to display input values in a meaningfull way as well as
 to provide semantically relevant filtering options to facilitate drilldowns into the
-records collections. Since form definitions are only used in a specific capacity by 
+records collections. Since form definitions are only used in a specific capacity by
 Webforms Analytics there are a few things that need to be kept in mind:
 * It is the CMS' responsibility to correctly version the form definitions.
 * There is no way to update a form definition. Each change to a form definition should
@@ -31,39 +31,39 @@ Webforms Analytics there are a few things that need to be kept in mind:
   * Javascript validation and calculated values are not persisted.
 
 #### Form Definitions / Form Fields
-A Form Field an object with three properties, `key`, `label` and `valueType`. 
+A Form Field an object with three properties, `key`, `label` and `valueType`.
 
 ##### Field Property: key
-`key` is the technical name of the Form Field. This is a unique string within the form 
+`key` is the technical name of the Form Field. This is a unique string within the form
 definition.
-  
+
 ##### Field Property: label
-`label` is the human readable counterpart of the Form Field. It can range from a 
+`label` is the human readable counterpart of the Form Field. It can range from a
 whole sentence calling the user to action to just a description of the expected input.
 
 ##### Field Property: valueType
-`valueType` is a classifier describing what data this field actually holds. Webforms 
+`valueType` is a classifier describing what data this field actually holds. Webforms
 Analytics distinguishes between the following data types:
-+ `TEXT`  
++ `TEXT`
   Simple freeform text, usually represented to the user of the form as a text area or
   text ipnut field.
-+ `DATE`  
-  A Unix timestamp with millisecond accuracy. These usually are presented to the user 
++ `DATE`
+  A Unix timestamp with millisecond accuracy. These usually are presented to the user
   as a date picker.
-+ `DATETIME`  
++ `DATETIME`
   Same as `DATE` just with a time of day component.
-+ `NUMBER`  
++ `NUMBER`
   A numeric value, floating point or not.
-+ `FILE`  
++ `FILE`
   An attached file, see also the Attachments section for more information.
-+ `PASSWORD`  
++ `PASSWORD`
   Like `TEXT` but should not be made visible in plain sight to consumers.
-+ `PAGEBREAK`  
++ `PAGEBREAK`
   A formating element describing the end of a page in a multipage form. Consuming
   applications can use this to paginate the display of form records.
-+ `STATUS`  
++ `STATUS`
   A string based enumeration.
-+ `STRING_ARRAY`  
++ `STRING_ARRAY`
   An array of textual data represented as a JSON list of strings in API responses.
 
 ### Form Records
@@ -104,7 +104,7 @@ all approved users and self-registered users become members of the _Unapproved u
 
 Permissions define which actions a user or a group is allowed to perform on form records. A
 permission assigns one or multiple rights on a form to a user or group. The following rights
-are currently available: `READ`, `EXPORT`, `DELETE`.
+are currently available: `READ`, `EXPORT`, `DELETE`, `TRACK`.
 
 JSON Example of a user's permission that qualifies them to view and export form records of
 the form with ID 3182:
@@ -275,7 +275,7 @@ variables to successfully save a Form Definition.
             }
 
 + Response 201
-        
+
     + Headers
 
             Content-Location: $HOST/formdefinitions/3182/6
@@ -306,9 +306,45 @@ variables to successfully save a Form Definition.
 + Response 409 (application/json)
 
     + Body
-    
+
             {
                 "message": "Version 6 of form 3182 already exists."
+            }
+
+### Deletes A Form Definition And All Associated Data [DELETE /formdefinitions/{formId}]
+
+This action deletes the Form Definition corresponding to the given `formId`, all related Form Records,
+permissions and statistics.
+
+The action returns the number of deleted records.
+
++ Parameters
+    + formId: `3182` (string) - ID of the Form
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "count": 10650
+            }
+
+### Deletes All Records Of A Form [DELETE /formdefinitions/{formId}/formrecords]
+
+This action deletes all related Form Records of the given `formId`, but keeps the Form Definition,
+permissions, etc.
+
+The action returns the number of deleted records.
+
++ Parameters
+    + formId: `3182` (string) - ID of the Form
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "count": 468
             }
 
 ## Form Records Collection [/formrecords]
@@ -339,7 +375,7 @@ Examples:
 
 2) ?query=city:Hamburg;last_name:SW:m;age:GT:18
 
-You have to escape semicolons that are not used as delimeter.
+You have to escape semicolons that are not used as delimiter.
 
 Starting with version 1.2.2, it is also possible to filter Form Records by
 their assigned status. To do that, use the optional `statusId` request parameter.
@@ -351,6 +387,18 @@ are in the status `open`.
 
 2) `?statusId=null` - uses the reserved keyword `null` and will only return
 records without a status.
+
+The parameter `sort` determines the sorting order of the result set.
+Multiple sort values are possible.
+Valid sort values are the input field values.
+The sorting direction is given by + and - as suffix of the sort value
+whereby, + equates to ASC and - DESC.
+If a suffix is missing, the default sorting direction is ASC.
+
+Examples:
+1) ?...query...&sort=+name1, -name2
+
+2) ?...query...&sort=name1, -name2
 
 + Parameters
     + formId: `3182` (string) - ID of the Form
@@ -388,6 +436,31 @@ records without a status.
                         ]
                     }
                 ]
+            }
+
+
+### Delete Form Records by Query [DELETE /formrecords{?formId,offset,size,sort,query,statusId}]
+
+Through this action, you can delete a collection of records in the same way as searching for records.
+Hence, all parameters are used exactly as they would for the corresponding GET Action
+`[GET /formrecords{?formId,offset,size,sort,query,statusId}]`
+
+However, instead of the found record-collection, the number of deleted records will be returned.
+
++ Parameters
+    + formId: `3182` (string) - ID of the Form
+    + offset: 0 (number, optional)
+    + size: 50 (number, optional)
+    + sort (string, optional)
+    + query (string, optional)
+    + statusId (string, optional)
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "count": 123
             }
 
 
@@ -469,9 +542,12 @@ This action retrieves a single Form Record.
 
 + Response 404
 
-### Delete A Form Record [DELETE]
+### Delete A Form Record [DELETE /formrecords/{recordId}]
 
 This action deletes a single Form Record.
+
++ Parameters
+    + recordId: `b3a121c1-177f-4446-929d-a8874f40aed9` (string) - ID of the Form Record
 
 + Response 204
 
