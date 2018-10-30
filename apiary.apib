@@ -1,5 +1,5 @@
 FORMAT: 1A
-HOST: http://ci.my-monday-consulting.com:18188/webforms-backend/api/v1
+HOST: http://localhost:8080/api/v1
 
 # Webforms Analytics Administrative REST API
 
@@ -127,6 +127,55 @@ To authenticate as an application the following steps are necessary:
   4. Select the new client and invoke the _Request token_ action to obtain an access token.
   5. Include an ``Authorization`` header with the access token in your API requests. The header
 should look like this: ``Authorization: Bearer <accesstoken>``.
+
+## RabbitMQ
+
+Starting with release 2.1.0, Webforms Analytics supports integration with RabbitMQ. This
+documentation explains which messages are available and covers the exchange names
+and routing keys.
+
+The RabbitMQ integration uses the same model as the REST API. All messages are sent in JSON
+format. It is recommended that clients, which create or subscribe to queues, use the
+`webforms-api-model` for deserialization.
+
+### Exchanges
+
+Analytics creates two exchanges: `mwf.formdefinitions` and `mwf.formrecords`. Clients
+can refer to them via constants inside the class `RabbitConstants`.
+
+Messages related to the `/formdefinitions` API endpoint are sent to the
+`mwf.formdefinitions` exchange. Messages related to the `/formrecords` endpoint are
+sent to the `mwf.formrecords` exchange.
+
+### Routing Keys
+
+All routing keys follow the pattern `${formId}.${model}.${event}`, where model is one
+of `form`, `record` or `status` and event is one of `created`, `updated` or `deleted`.
+
+### Events
+
+A message is sent when one of the following events occurs. The specified routing keys
+use the sample form ID `1234`.
+
+- Model `form`:
+  - `1234.form.created`: A new form definition has been created.
+  Message content: the `FormDefinition` model.
+  - `1234.form.deleted`: A complete form has been deleted.
+  Message content: `{"formId": "1234"}`
+
+- Model `record`:
+  - `1234.record.created`: A new form record has been submitted.
+  Message content: the `FormRecord` model.
+  - `1234.record.deleted`: A form record has been deleted.
+  Message content (sample): `{"formId": "1234", "recordId":
+  "9b1d865a-1bea-4ff3-aeee-8e4874a20187"}`
+
+- Model `status`:
+  - `1234.status.updated`: The status of a form record has been updated.
+  Message content (sample): `{"formId": "1234",
+  "recordId": "9b1d865a-1bea-4ff3-aeee-8e4874a20187",
+  "newStatusId": "f198e04a-b3a5-40dd-9d58-c4f9a7544ad6",
+  "oldStatusId": "ddb69f3f-2619-4bc5-b3c3-632647a7e28c"}`
 
 ## Form Definitions Collection [/formdefinitions]
 
@@ -611,6 +660,142 @@ Record has a Status assigned.
 
 + Response 404
 
+### Get all revisions for a Form Record [GET /formrecords/{recordId}/revisions{?offset,size}]
+
+Lists full revision data for a Form Record. The parameters `offset` and `size` offer paging
+capabilities. If you're only interested in the metadata of revisions (eg. the author or comment),
+see the next endpoint.
+
+`404` is only returned if the Form Record does not exist.
+
++ Parameters
+    + recordId: `fff67dd5-c2b1-4265-8df6-63891f817957` (string) - ID of the Form Record
+    + offset: 0 (number, optional)
+    + size: 50 (number, optional)
+
++ Response 200 (application/json)
+
+    {
+        "recordId": "fff67dd5-c2b1-4265-8df6-63891f817957",
+        "formId": "7412",
+        "revision": 2,
+        "timestamp": 1528984285460,
+        "authorId": "d613cea8-c964-4ff1-b88e-2f64efcfb531",
+        "author": "Oliver",
+        "comment": "Updated the address.",
+        "record": {
+            "recordId": "fff67dd5-c2b1-4265-8df6-63891f817957",
+            "formId": "7412",
+            "version": 3,
+            "statusId": null,
+            "fields": {
+                "name": "Max Mustermann",
+                "street": "Breite Str. 61",
+                "city": "Hamburg"
+            },
+            "metadata": {
+                "_WF_creationTime": 1528438854657,
+                "_WF_version": "3",
+                "_WF_optedIn": "0",
+                "_WF_userAgent": "Mozilla/5.0 (Windows; U; Windows NT 5.1; nl-NL) AppleWebKit/523.15 (KHTML, like Gecko, Safari/419.3) Arora/0.2",
+                "_WF_language": "de,en-US;q=0.7,en;q=0.3"
+            },
+            "attachments": [],
+        }
+    }
+
++ Response 404
+
+### Get all revision info for a Form Record [GET /formrecords/{recordId}/revisions/info{?offset,size}]
+
+Lists the metadata (revision, author, comment and creation time) of all revisions for a Form Record.
+The parameters `offset` and `size` offer paging capabilities.
+
+`404` is only returned if the Form Record does not exist.
+
++ Parameters
+    + recordId: `195e6663-9d40-41c7-8c63-2dea194746c6` (string) - ID of the Form Record
+    + offset: 0 (number, optional)
+    + size: 50 (number, optional)
+
++ Response 200 (application/json)
+
+    {
+        "totalSize": 3,
+        "offset": 0,
+        "size": 1,
+        "data":[{
+            "recordId":"195e6663-9d40-41c7-8c63-2dea194746c6",
+            "formId":"3182",
+            "revision":3,
+            "timestamp":1528735377068,
+            "authorId":"d613cea8-c964-4ff1-b88e-2f64efcfb531",
+            "author":"Oliver",
+            "comment":"Status: 'in progress' → 'done'"
+        }]
+    }
+
++ Response 404
+
+### Get a revision for a Form Record [GET /formrecords/{recordId}/revision/{revision}]
+
+Returns the full revision of a Form Record identified by its revision number.
+
+`404` is only returned if the Form Record does not exist.
+
++ Parameters
+    + recordId: `b3a121c1-177f-4446-929d-a8874f40aed9` (string) - ID of the Form Record
+    + revision: `2` (number) - Revision of the Form Record
+
++ Response 200 (application/json)
+
++ Response 404
+
+### Rollback the Form Record to a revision [POST /formrecords/{recordId}/revision/{revision}/rollback]
+
+Performs a rollback of the Form Record to the given revision. A new revision with the rolled back version will be
+created and returned in response.
+
+`404` is only returned if the Form Record does not exist.
+
++ Parameters
+    + recordId: `b3a121c1-177f-4446-929d-a8874f40aed9` (string) - ID of the Form Record
+    + revision: `1` (number) - Revision number of the Form Record
+
++ Response 200 (application/json)
+
+    {
+        "recordId": "b3a121c1-177f-4446-929d-a8874f40aed9",
+        "formId": "7412",
+        "revision": 3,
+        "timestamp": 1528984285460,
+        "authorId": "d613cea8-c964-4ff1-b88e-2f64efcfb531",
+        "author": "Oliver",
+        "comment": "Rollback: Revision #2 → Revision #1",
+        "record": {
+            "recordId": "b3a121c1-177f-4446-929d-a8874f40aed9",
+            "formId": "7412",
+            "version": 3,
+            "statusId": null,
+            "fields": {
+                "name": "Max Mustermann",
+                "street": "Pinnasberg 45",
+                "city": "Hamburg"
+            },
+            "metadata": {
+                "_WF_creationTime": 1528438854657,
+                "_WF_version": "3",
+                "_WF_optedIn": "0",
+                "_WF_userAgent": "Mozilla/5.0 (Windows; U; Windows NT 5.1; nl-NL) AppleWebKit/523.15 (KHTML, like Gecko, Safari/419.3) Arora/0.2",
+                "_WF_language": "de,en-US;q=0.7,en;q=0.3"
+            },
+            "attachments": [],
+        }
+    }
+
++ Response 404
+
+
 ## Record Attachments [/formattachments]
 
 The `/attachments` offers actions to add or get attachments.
@@ -842,7 +1027,7 @@ The `/users` endpoint offers methods to list all existing users and to create ne
 
 ### List All Users [GET /users{?offset,size}]
 
-Here, you can list all exisiting users. The parameters `offset` and `size` offer paging
+Here, you can list all existing users. The parameters `offset` and `size` offer paging
 capabilities. Please note that the property `groups` only contains IDs and that the `permissions`
 collection includes user and group permissions.
 
