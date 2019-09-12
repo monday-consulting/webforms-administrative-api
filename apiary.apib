@@ -1472,3 +1472,13 @@ If the user or group does not exist, `Bad Request - 400` is returned.
     + userId: `6aa59a5f-6ad6-42d7-a20c-9878d24d4ad2` (string) - ID of the User
 
 + Response 200
+
+## Search [/search]
+
+### Rebuild search index [DELETE /search/index]
+
+This method triggers a complete rebuild of the Solr index. This can take a long time
+(depending on the amount of form data)! The search may not be available at this time,
+or may only be partially available.
+
++ Response 200
